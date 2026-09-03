@@ -130,7 +130,7 @@ export function AuditPage() {
                   </td>
                   <td className="hash-col">
                     <span className="sha-verified-badge">Verified</span>
-                    <span className="hash-text">{entry.tamper_hash || 'SHA256-EE4692E6882B157E9B17B7A7776E722571E68D'}</span>
+                    <span className="hash-text">{entry.tamperHash || 'SHA256-EE4692E6882B157E9B17B7A7776E722571E68D'}</span>
                   </td>
                 </tr>
               ))}
