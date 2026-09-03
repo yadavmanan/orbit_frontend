@@ -75,7 +75,8 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
     return { supported: false, registeredTools: 0 };
   }
 
-  const { registerTool } = modelContext;
+  // const { registerTool } = modelContext;
+  const registerTool = modelContext.registerTool.bind(modelContext);
   const registrations: Array<Promise<void>> = [];
 
   // ---------- Read-only tools ----------
