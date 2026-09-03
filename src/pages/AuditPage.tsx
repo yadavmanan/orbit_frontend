@@ -10,6 +10,7 @@ interface AuditEntry {
   target_table: string | null;
   target_id: string | null;
   detail: Record<string, any> | null;
+  tamperHash?: string;
 }
 
 export function AuditPage() {
