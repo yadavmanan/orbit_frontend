@@ -25,6 +25,15 @@ export interface WebMcpBindings {
   refresh: () => Promise<void>;
 }
 
+export interface WebMcpRegistrationResult {
+  supported: boolean;
+  registeredTools: number;
+}
+
+export function hasWebMcpSupport(): boolean {
+  return typeof document.modelContext?.registerTool === 'function';
+}
+
 /** Resolves a proposal/move id pair the same way the human Approval Queue buttons do. */
 function resolveMoveTarget(data: DashboardData, moveOrProposalId: string, explicitProposalId?: string) {
   const proposal = data.approvalQueue.find(
@@ -56,16 +65,17 @@ async function postJson(path: string, body?: Record<string, unknown>) {
  * Destructive, hard-to-reverse operations (full demo reset) are intentionally left
  * out of the agent-facing surface and remain a human-only action in Settings.
  */
-export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSignal): void {
-  if (typeof document.modelContext?.registerTool !== 'function') {
-    return;
+export async function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSignal): Promise<WebMcpRegistrationResult> {
+  if (!hasWebMcpSupport()) {
+    return { supported: false, registeredTools: 0 };
   }
 
   const { registerTool } = document.modelContext;
+  const registrations: Array<Promise<void>> = [];
 
   // ---------- Read-only tools ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'get_network_status',
       title: 'Get network status',
@@ -76,9 +86,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       execute: async () => ({ status_rail: bindings.getData().statusRail }),
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'get_constraints',
       title: 'Get active policy constraints',
@@ -89,9 +99,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       execute: async () => bindings.getData().constraints,
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'get_approval_queue',
       title: 'Get pending proposals',
@@ -102,9 +112,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       execute: async () => ({ proposals: bindings.getData().approvalQueue }),
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'get_audit_trail',
       title: 'Get audit trail',
@@ -114,11 +124,11 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       execute: async () => ({ events: bindings.getData().auditStrip }),
     },
     { signal },
-  );
+  ));
 
   // ---------- Proposal generation (Pillars 1 & 2) ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'propose_scanner_rebalance',
       title: 'Propose a scanner rebalance',
@@ -133,9 +143,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'propose_remote_read_assignment',
       title: 'Propose a remote radiologist read',
@@ -150,9 +160,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'propose_remote_scan_assist',
       title: 'Propose remote scan assistance',
@@ -175,9 +185,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'run_simulation',
       title: 'Run a deterministic impact simulation',
@@ -199,11 +209,11 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
   // ---------- Human-in-the-loop review actions ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'approve_move',
       title: 'Approve a staged move',
@@ -228,9 +238,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'reject_move',
       title: 'Reject a staged move',
@@ -257,9 +267,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'execute_move',
       title: 'Execute an approved move',
@@ -284,11 +294,11 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
   // ---------- Communication drafting (never sent automatically) ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'draft_patient_notification',
       title: 'Draft a patient notification',
@@ -311,9 +321,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'draft_staff_notification',
       title: 'Draft a staff notification',
@@ -339,11 +349,11 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
   // ---------- Policy administration ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'update_constraints',
       title: 'Update policy constraints',
@@ -371,11 +381,11 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
 
   // ---------- Demo scenario presets (synthetic data only) ----------
 
-  registerTool(
+  registrations.push(registerTool(
     {
       name: 'trigger_scenario',
       title: 'Trigger a crisis scenario preset',
@@ -401,6 +411,9 @@ export function registerWebMcpTools(bindings: WebMcpBindings, signal: AbortSigna
       },
     },
     { signal },
-  );
+  ));
+
+  await Promise.all(registrations);
+  return { supported: true, registeredTools: registrations.length };
 }
 

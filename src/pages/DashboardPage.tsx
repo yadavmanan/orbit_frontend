@@ -3,7 +3,7 @@ import { LiveBoard } from '../components/LiveBoard';
 import { ApprovalQueue } from '../components/ApprovalQueue';
 import { AuditStrip } from '../components/AuditStrip';
 import type { DashboardData } from '../types';
-import { registerWebMcpTools } from '../webmcpTools';
+import { hasWebMcpSupport, registerWebMcpTools } from '../webmcpTools';
 import { API_BASE } from '../config';
 
 interface ApiStatusItem {
@@ -115,11 +115,14 @@ function mapPayload(payload: ApiDashboardPayload): DashboardData {
 }
 
 export function DashboardPage() {
+  const webMcpAvailable = hasWebMcpSupport();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const dataRef = useRef<DashboardData | null>(null);
+  const toolsRegisteredRef = useRef(false);
 
   const refreshDashboard = async () => {
     const response = await fetch(`${API_BASE}/dashboard`);
@@ -128,6 +131,7 @@ export function DashboardPage() {
     }
     const payload = await response.json();
     const mapped = mapPayload(payload);
+    dataRef.current = mapped;
     setData(mapped);
     return mapped;
   };
@@ -165,18 +169,36 @@ export function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (data) {
-      registerWebMcpTools(
-        {
-          getData: () => data,
-          refresh: async () => {
-            await refreshDashboard();
-            window.dispatchEvent(new Event('orbit:refresh'));
-          },
-        },
-        abortControllerRef.current?.signal ?? new AbortController().signal
-      );
+    if (!data || toolsRegisteredRef.current) {
+      return;
     }
+
+    toolsRegisteredRef.current = true;
+
+    void registerWebMcpTools(
+      {
+        getData: () => {
+          if (!dataRef.current) {
+            throw new Error('Dashboard data is not ready yet.');
+          }
+          return dataRef.current;
+        },
+        refresh: async () => {
+          await refreshDashboard();
+          window.dispatchEvent(new Event('orbit:refresh'));
+        },
+      },
+      abortControllerRef.current?.signal ?? new AbortController().signal,
+    )
+      .then((result) => {
+        if (!result.supported) {
+          console.info('WebMCP unavailable in this browser: document.modelContext is not implemented here.');
+        }
+      })
+      .catch((registrationError) => {
+        toolsRegisteredRef.current = false;
+        console.error('WebMCP tool registration failed.', registrationError);
+      });
   }, [data]);
 
     const handleProposalAction = async (proposalId: string, action: 'approve' | 'reject' | 'execute') => {
@@ -247,6 +269,11 @@ export function DashboardPage() {
             <span><strong>{data.liveBoard.length}</strong> live cases</span>
             <span><strong>{data.approvalQueue.filter((proposal) => proposal.status === 'pending').length}</strong> pending</span>
           </div>
+          {!webMcpAvailable ? (
+            <p className="hero-caption">
+              WebMCP tools are implemented in this app, but this browser runtime does not expose the draft document.modelContext API.
+            </p>
+          ) : null}
         </div>
       </div>
       <div className="dashboard-grid">
