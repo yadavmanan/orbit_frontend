@@ -1,0 +1,116 @@
+import type { DashboardData } from './types';
+
+export const dashboardData: DashboardData = {
+  statusRail: [
+    {
+      site: 'North Campus',
+      modality: 'MRI',
+      utilizationPercent: 94,
+      queueDepth: 18,
+      idleHours: 0.5,
+      coverage: 'Radiologist constrained',
+    },
+    {
+      site: 'Riverside',
+      modality: 'MRI',
+      utilizationPercent: 61,
+      queueDepth: 6,
+      idleHours: 4,
+      coverage: 'Balanced',
+    },
+    {
+      site: 'West Annex',
+      modality: 'CT',
+      utilizationPercent: 73,
+      queueDepth: 9,
+      idleHours: 2,
+      coverage: 'Technologist constrained',
+    },
+  ],
+  liveBoard: [
+    {
+      timeLabel: '08:00',
+      scanner: 'MRI-02',
+      modality: 'MRI',
+      caseId: 'PT-1042',
+      urgency: 'urgent',
+      status: 'North Campus queue hold',
+    },
+    {
+      timeLabel: '10:30',
+      scanner: 'MRI-07',
+      modality: 'MRI',
+      caseId: 'PT-1180',
+      urgency: 'routine',
+      status: 'Riverside open capacity',
+    },
+    {
+      timeLabel: '12:15',
+      scanner: 'CT-03',
+      modality: 'CT',
+      caseId: 'PT-1225',
+      urgency: 'stat',
+      status: 'Protected emergency slot',
+    },
+    {
+      timeLabel: '15:10',
+      scanner: 'US-05',
+      modality: 'US',
+      caseId: 'PT-1314',
+      urgency: 'routine',
+      status: 'Portable team availability',
+    },
+  ],
+  approvalQueue: [
+    {
+      id: 'prop-001',
+      patientId: 'PT-1042',
+      fromScanner: 'North Campus MRI-02',
+      toScanner: 'Riverside MRI-07',
+      rationale: 'Moves an urgent case into Thursday capacity without exceeding the travel limit or touching protected STAT slots.',
+      urgency: 'urgent',
+      status: 'pending',
+      constraintChecks: [
+        'Travel distance within 25 km limit',
+        'No protected shift conflict',
+        'Destination scanner has open capacity',
+      ],
+      isNew: true,
+    },
+    {
+      id: 'prop-002',
+      patientId: 'PT-1154',
+      fromScanner: 'North Campus MRI-02',
+      toScanner: 'Riverside MRI-08',
+      rationale: 'Reduces the backlog at the overloaded site while keeping staff coverage stable across both rooms.',
+      urgency: 'routine',
+      status: 'pending',
+      constraintChecks: [
+        'Travel distance within 25 km limit',
+        'Technologist coverage unchanged at both sites',
+        'No protected shift conflict',
+      ],
+    },
+  ],
+  auditStrip: [
+    {
+      id: 'audit-001',
+      actor: 'Coordinator',
+      action: 'Approved move',
+      timestamp: '08:12',
+      detail: 'Travel and licensure checks cleared for prop-001.',
+    },
+    {
+      id: 'audit-002',
+      actor: 'Agent',
+      action: 'Drafted proposal',
+      timestamp: '08:09',
+      detail: '2 MRI moves staged for review.',
+    },
+  ],
+  constraints: {
+    maxTravelKm: 25,
+    protectedShifts: ['STAT hold 12:00-14:00', 'Pediatric MRI 15:00-17:00'],
+    remoteReadingEnabled: true,
+  },
+};

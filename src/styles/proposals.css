@@ -1,0 +1,341 @@
+.proposals-list {
+  display: grid;
+  gap: 16px;
+}
+
+.proposal-card {
+  padding: 20px;
+  border-left: 4px solid var(--line-strong);
+}
+
+.proposal-card:hover {
+  transform: translateY(-1px);
+}
+
+.proposal-card.proposal-pending {
+  border-left-color: var(--warning);
+}
+
+.proposal-card.proposal-approved {
+  border-left-color: var(--success);
+}
+
+.proposal-card.proposal-rejected {
+  border-left-color: var(--critical);
+}
+
+.proposal-card.proposal-executed {
+  border-left-color: var(--accent);
+}
+
+.proposal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.proposal-header h3 {
+  text-transform: capitalize;
+}
+
+.rationale {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.created {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.impact-section {
+  background: var(--surface-soft);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.impact-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--accent-strong);
+}
+
+.impact-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.impact-metric {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-values {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.metric-before {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.metric-arrow {
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.metric-after {
+  color: var(--success);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.metric-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.toggle-moves {
+  background: none;
+  border: none;
+  color: var(--accent-strong);
+  font-weight: 600;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 1rem 0;
+}
+
+.toggle-moves:hover {
+  color: var(--accent);
+}
+
+.moves-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.move-item {
+  background-color: rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--line-strong);
+}
+
+.move-item.move-pending {
+  border-left-color: var(--warning);
+}
+
+.move-item.move-approved {
+  border-left-color: var(--success);
+}
+
+.move-item.move-executed {
+  border-left-color: var(--accent);
+}
+
+.move-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  justify-content: space-between;
+}
+
+.move-kind-badge {
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.1), rgba(15, 118, 110, 0.05));
+  color: var(--accent-strong);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  border: 1px solid rgba(15, 118, 110, 0.2);
+}
+
+.move-status-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.move-status-pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #FF9800;
+}
+
+.move-status-approved {
+  background: rgba(46, 133, 90, 0.15);
+  color: var(--success);
+}
+
+.move-status-executed {
+  background: rgba(15, 118, 110, 0.15);
+  color: var(--accent-strong);
+}
+
+.move-status-rejected {
+  background: rgba(181, 71, 60, 0.15);
+  color: var(--critical);
+}
+
+.constraints {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+  padding: 12px;
+  background: rgba(47, 133, 90, 0.05);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(47, 133, 90, 0.15);
+}
+
+.constraint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--success);
+  background: rgba(47, 133, 90, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  border: 1px solid rgba(47, 133, 90, 0.2);
+}
+
+.move-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.move-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-approve:hover {
+  background-color: #256f4c;
+}
+
+.btn-reject {
+  background-color: var(--critical);
+  color: white;
+}
+
+.btn-reject:hover {
+  background-color: #9c372c;
+}
+
+.btn-execute {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-execute:hover {
+  background-color: var(--accent-strong);
+}
+
+/* Button component styles */
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 36px;
+}
+
+.button-primary {
+  background-color: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.button-primary:hover {
+  background-color: #256f4c;
+  border-color: #256f4c;
+}
+
+.button-reject {
+  background-color: var(--critical);
+  color: white;
+  border-color: var(--critical);
+}
+
+.button-reject:hover {
+  background-color: #9c372c;
+  border-color: #9c372c;
+}
+
+.button-secondary {
+  background-color: #f7f9fb;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.button-secondary:hover {
+  background-color: #eef2f6;
+  border-color: var(--line-strong);
+}
+
+@media (max-width: 768px) {
+  .proposal-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-badge {
+    margin-top: 0.5rem;
+  }
+
+  .move-actions {
+    flex-direction: column;
+  }
+
+  .move-actions button {
+    width: 100%;
+  }
+}
