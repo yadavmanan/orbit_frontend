@@ -33,6 +33,15 @@
 html,
 body,
 #root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
 .hero-copy h1 {
   font-size: 1.45rem;
   line-height: 1.1;

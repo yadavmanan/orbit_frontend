@@ -70,7 +70,12 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
     return { supported: false, registeredTools: 0 };
   }
 
-  const { registerTool } = document.modelContext;
+  const modelContext = document.modelContext;
+  if (!modelContext) {
+    return { supported: false, registeredTools: 0 };
+  }
+
+  const { registerTool } = modelContext;
   const registrations: Array<Promise<void>> = [];
 
   // ---------- Read-only tools ----------
@@ -176,7 +181,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const siteId = (input as { site_id?: string }).site_id;
         const query = siteId ? `&site_id=${encodeURIComponent(siteId)}` : '';
         const { data } = await postJson(`/tools/propose_remote_scan_assist?actor=agent${query}`);
@@ -202,7 +207,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const proposalId = String((input as { proposal_id?: string }).proposal_id ?? '');
         const { data } = await postJson(`/tools/run_scenario_simulation/${proposalId}`);
         return data;
@@ -229,7 +234,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const { move_id, proposal_id } = input as { move_id?: string; proposal_id?: string };
         const { proposalId, moveId } = resolveMoveTarget(bindings.getData(), String(move_id ?? ''), proposal_id);
         const { ok, data } = await postJson(`/proposals/${proposalId}/approve/${moveId}?reviewer=agent`);
@@ -257,7 +262,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const { move_id, proposal_id, reason } = input as { move_id?: string; proposal_id?: string; reason?: string };
         const { proposalId, moveId } = resolveMoveTarget(bindings.getData(), String(move_id ?? ''), proposal_id);
         const query = reason ? `?reviewer=agent&reason=${encodeURIComponent(reason)}` : '?reviewer=agent';
@@ -284,7 +289,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const moveId = String((input as { move_id?: string }).move_id ?? '');
         const { ok, data } = await postJson(`/tools/execute_move/${moveId}`);
         if (ok) await bindings.refresh();
@@ -314,7 +319,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const { appointment_id, proposal_id } = input as { appointment_id?: string; proposal_id?: string };
         const { data } = await postJson(`/tools/draft_patient_notification?appointment_id=${appointment_id}&proposal_id=${proposal_id}`);
         return data;
@@ -340,7 +345,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const { proposal_id, move_id, recipient_role } = input as { proposal_id?: string; move_id?: string; recipient_role?: string };
         const { data } = await postJson(
           `/tools/draft_staff_notification?proposal_id=${proposal_id}&move_id=${move_id}&recipient_role=${recipient_role ?? 'radiologist'}`,
@@ -374,7 +379,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const { data } = await postJson('/tools/update_constraints', input);
         await bindings.refresh();
         return data;
@@ -403,7 +408,7 @@ export async function registerWebMcpTools(bindings: WebMcpBindings, signal: Abor
         additionalProperties: false,
       },
       annotations: { readOnlyHint: false },
-      execute: async (input) => {
+      execute: async (input: Record<string, unknown>) => {
         const scenarioKey = String((input as { scenario_key?: string }).scenario_key ?? '');
         const { data } = await postJson(`/tools/trigger_scenario/${scenarioKey}`);
         await bindings.refresh();
